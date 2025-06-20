@@ -26,7 +26,6 @@ namespace WebApplication2
         public CountersEventListener(string name)
         {
             this.Name = name;
-            EventSourceCreated += OnEventSourceCreated;
         }
 
         private void Log(string message)
@@ -34,15 +33,15 @@ namespace WebApplication2
             Console.WriteLine($"{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff")}:{Name}: {message}");
         }
 
-        private void OnEventSourceCreated(object? sender, EventSourceCreatedEventArgs e)
+        protected override void OnEventSourceCreated(EventSource eventSource)
         {
-            if (e.EventSource == null || !TrackedEvents.Contains(e.EventSource.Name))
+            if (eventSource == null || !TrackedEvents.Contains(eventSource.Name))
             {
                 return;
             }
 
-            this.Log($"{e.EventSource.ToString()} has been created");
-            EventSources[e.EventSource.Name] = e.EventSource;
+            this.Log($"{eventSource.ToString()} has been created");
+            EventSources[eventSource.Name] = eventSource;
         }
 
         protected override void OnEventWritten(EventWrittenEventArgs eventData)
