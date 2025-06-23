@@ -12,81 +12,60 @@ namespace WebApplication2
 {
     public class CountersEventListener : EventListener
     {
-        private readonly List<string> TrackedEvents = new List<string>
-        {
-            "Microsoft.AspNetCore.Hosting",
-            "Microsoft-AspNetCore-Server-Kestrel",
-        };
-
-        public readonly ConcurrentDictionary<string, EventSource> EventSources =
-            new ConcurrentDictionary<string, EventSource>();
-
-        private string Name;
+        private const string TrackedEvent = "Microsoft-AspNetCore-Server-Kestrel";
+        private EventSource? _trackedEventSource;
+        private readonly string _name;
 
         public CountersEventListener(string name)
         {
-            this.Name = name;
+            this._name = name;
         }
 
         private void Log(string message)
         {
-            Console.WriteLine($"{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff")}:{Name}: {message}");
+            Console.WriteLine($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff}:{this._name}: {message}");
         }
 
         protected override void OnEventSourceCreated(EventSource eventSource)
         {
-            if (eventSource == null || !TrackedEvents.Contains(eventSource.Name))
+            if (TrackedEvent != eventSource.Name)
             {
                 return;
             }
 
-            this.Log($"{eventSource.ToString()} has been created");
-            EventSources[eventSource.Name] = eventSource;
-        }
-
-        protected override void OnEventWritten(EventWrittenEventArgs eventData)
-        {
-            if (eventData.EventName is null || !eventData.EventName.Equals("EventCounters") ||
-                eventData.Payload == null)
-            {
-                return;
-            }
-
-            if (!this.TrackedEvents.Contains(eventData.EventSource.Name))
-            {
-                return;
-            }
-
-            this.Log($"{eventData.EventSource} event has been written");
-        }
-
-        public void DisableEvents()
-        {
-            foreach (var keyValuePair in EventSources)
-            {
-                DisableEvents(keyValuePair.Value);
-            }
-
-            this.Log($"Disabled all events {string.Join(",", EventSources.Keys)}");
-        }
-
-
-        /// <summary>
-        /// invoke CountersEventListener.Instance.EnableEvents
-        /// </summary>
-        public void EnableEvents()
-        {
+            this.Log($"{eventSource} has been created");
+            this._trackedEventSource = eventSource;
+            
             var args = new Dictionary<string, string?>
             {
                 ["EventCounterIntervalSec"] = "5"
             };
+            
+            this.EnableEvents(this._trackedEventSource, EventLevel.Verbose, EventKeywords.All, args);
+        }
 
-            foreach (var keyValuePair in EventSources)
-            {
-                EnableEvents(keyValuePair.Value, EventLevel.Verbose, EventKeywords.All, args);
-            }
+        protected override void OnEventWritten(EventWrittenEventArgs eventData)
+        {
+            if (eventData.EventName is null || eventData.Payload is null)
+                return;
 
-            this.Log($"Enabled all events {string.Join(",", EventSources.Keys)}");
+            // if (!eventData.EventName.Equals("EventCounters"))
+            //     return;
+                
+            if (TrackedEvent != eventData.EventSource.Name)
+                return;
+
+            this.Log($"{eventData.EventSource}:{eventData.EventName} event has been written");
+        }
+
+        public void DisableEvent()
+        {
+            if (this._trackedEventSource is null)
+                return;
+            
+            this.DisableEvents(this._trackedEventSource);
+
+            this.Log($"*** Disabled event {this._trackedEventSource}");
         }
     }
 
@@ -98,33 +77,52 @@ namespace WebApplication2
             var app = builder.Build();
             app.Map(new PathString("/myhandler"), (Action<IApplicationBuilder>)(b => b.UseMyHandler()));
             var timeToEnable = TimeSpan.FromSeconds(10);
+            var timeToDisableC1 = timeToEnable.Multiply(1);
             var timeToDisableC2 = timeToEnable.Multiply(2);
-            var timeToDisableC1 = timeToEnable.Multiply(3);
+            var timeToDisableC3 = timeToEnable.Multiply(3);
 
+            Console.WriteLine("starting");
             var c1 = new CountersEventListener("c1");
-            Task.Run(
-                () =>
-                {
-                    Thread.Sleep(timeToEnable);
-                    c1.EnableEvents();
-                });
-
             var c2 = new CountersEventListener("c2");
-            Task.Run(
-                () =>
+            var c3 = new CountersEventListener("c3");
+
+            Task.Run(() =>
+            {
+                Console.WriteLine("*** IN THREAD 1");
+                Thread.Sleep(timeToDisableC1);
+                Console.WriteLine("*** AFTER SLEEP 1");
+                c1.DisableEvent();
+            });
+
+            Task.Run(() =>
+            {
+                Console.WriteLine("*** IN THREAD 2");
+                Thread.Sleep(timeToDisableC2);
+                Console.WriteLine("*** AFTER SLEEP 2");
+                c2.DisableEvent();
+            });
+            
+            Task.Run(() =>
+            {
+                Console.WriteLine("*** IN THREAD 3");
+                Thread.Sleep(timeToDisableC3);
+                Console.WriteLine("*** AFTER SLEEP 3");
+                c3.DisableEvent();
+            });
+
+            Console.WriteLine("running");
+
+            Task.Run(() =>
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(2));
+                HttpClient httpClient = new HttpClient();
+                httpClient.BaseAddress = new Uri("http://localhost:5165");
+                while (true)
                 {
-                    Thread.Sleep(timeToDisableC2);
-                    c2.DisableEvents();
-                });
-
-            Task.Run(
-                () =>
-                {
-                    Thread.Sleep(timeToDisableC1);
-                    c1.DisableEvents();
-                });
-
-
+                    httpClient.GetAsync("/myhandler").Result.EnsureSuccessStatusCode();
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                }
+            });
             app.Run();
         }
     }

@@ -1,10 +1,17 @@
-When I run this for about 30 seconds, this is the output I see. Although we only ever enable events for listener `c1`, the `OnEventWritten` callback of `c2` still gets called. Disabling events for `c2` does nothing. But, disabled events for `c1` disables them for both `c1` and `c2`
-
+I run this program until all events are disabled.
+What we can see is disabling an `EventSource` for a specific `EventListener` instance causes it to not receive anymore events, but `EventCounters` continue to get received. Therefore, it seems `EventCounters` arrive to an `EventListener` once a single listener has enabled the event source, and stop being sent once all `EventListeners` that enabled this `EventSource` disable it.
 ```
-2025-06-20 22:42:12.787:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) has been created
-2025-06-20 22:42:12.792:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) has been created
-2025-06-20 22:42:12.822:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) has been created
-2025-06-20 22:42:12.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) has been created
+starting
+running
+*** IN THREAD 1
+*** IN THREAD 2
+*** IN THREAD 3
+2025-06-22 23:59:14.354:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) has been created
+2025-06-22 23:59:14.358:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) has been created
+2025-06-22 23:59:14.358:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) has been created
+2025-06-22 23:59:14.370:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):Configuration event has been written
+2025-06-22 23:59:14.370:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):Configuration event has been written
+2025-06-22 23:59:14.370:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):Configuration event has been written
 info: Microsoft.Hosting.Lifetime[14]
       Now listening on: http://localhost:5165
 info: Microsoft.Hosting.Lifetime[0]
@@ -12,94 +19,291 @@ info: Microsoft.Hosting.Lifetime[0]
 info: Microsoft.Hosting.Lifetime[0]
       Hosting environment: Development
 info: Microsoft.Hosting.Lifetime[0]
-      Content root path: C:\Users\john.mancini\Desktop\WebApplication2\WebApplication2
-2025-06-20 22:42:22.820:c1: Enabled all events Microsoft-AspNetCore-Server-Kestrel,Microsoft.AspNetCore.Hosting
-2025-06-20 22:42:27.826:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.826:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.827:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.827:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.829:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.829:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:27.829:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:27.829:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.798:c2: Disabled all events Microsoft-AspNetCore-Server-Kestrel,Microsoft.AspNetCore.Hosting
-2025-06-20 22:42:32.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.828:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.828:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.829:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.830:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.830:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.830:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.830:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:32.830:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:32.830:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.822:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.822:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.822:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.822:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.824:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.824:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.824:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.824:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.824:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d) event has been written
-2025-06-20 22:42:37.824:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.824:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.824:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.824:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.824:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.824:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.825:c1: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:37.825:c2: EventSource(Microsoft.AspNetCore.Hosting, 9ded64a4-414c-5251-dcf7-1e4e20c15e70) event has been written
-2025-06-20 22:42:42.792:c1: Disabled all events Microsoft-AspNetCore-Server-Kestrel,Microsoft.AspNetCore.Hosting
-info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /Users/john.mancini/src/EventListenerBugRepro/WebApplication2
+2025-06-22 23:59:14.790:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:14.790:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:14.790:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:14.796:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStop event has been written
+2025-06-22 23:59:14.797:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStop event has been written
+2025-06-22 23:59:14.797:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStop event has been written
+2025-06-22 23:59:14.823:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:14.823:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:14.823:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:14.844:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:14.844:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:14.844:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:14.845:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:14.845:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:14.845:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:16.372:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:16.372:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:16.372:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):ConnectionStart event has been written
+2025-06-22 23:59:16.377:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:16.377:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:16.377:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:16.378:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:16.378:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:16.378:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:17.383:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:17.383:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:17.383:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:17.383:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:17.383:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:17.383:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:18.386:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:18.387:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:18.387:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:18.387:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:18.387:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:18.387:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:19.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.367:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.367:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.367:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.369:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:19.389:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:19.390:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:19.390:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:19.390:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:19.390:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:19.390:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:20.391:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:20.391:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:20.391:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:20.391:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:20.391:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:20.391:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:21.393:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:21.393:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:21.393:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:21.393:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:21.393:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:21.393:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:22.395:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:22.395:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:22.395:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:22.395:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:22.395:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:22.395:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:23.400:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:23.400:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:23.400:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:23.400:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:23.400:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:23.400:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+*** AFTER SLEEP 1
+2025-06-22 23:59:24.340:c1: *** Disabled event EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d)
+2025-06-22 23:59:24.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:24.402:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:24.402:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:24.402:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:24.402:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:25.404:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:25.405:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:25.405:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:25.405:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:26.409:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:26.409:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:26.409:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:26.409:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:27.413:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:27.413:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:27.413:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:27.413:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:28.415:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:28.416:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:28.416:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:28.416:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:29.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:29.419:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:29.419:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:29.419:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:29.419:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:30.421:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:30.421:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:30.421:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:30.421:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:31.423:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:31.423:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:31.424:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:31.424:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:32.428:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:32.428:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:32.428:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:32.428:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:33.431:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:33.431:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:33.431:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:33.431:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+*** AFTER SLEEP 2
+2025-06-22 23:59:34.340:c2: *** Disabled event EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d)
+2025-06-22 23:59:34.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.364:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.364:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.366:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.366:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.366:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.367:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.367:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.367:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.367:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:34.433:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:34.434:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:35.435:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:35.436:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:36.441:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:36.441:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:37.444:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:37.445:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:38.450:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:38.450:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:39.364:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.365:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.367:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.368:c1: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.369:c2: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.369:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):EventCounters event has been written
+2025-06-22 23:59:39.455:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:39.455:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:40.457:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:40.457:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:41.460:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:41.460:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:42.464:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:42.465:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+2025-06-22 23:59:43.468:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStart event has been written
+2025-06-22 23:59:43.468:c3: EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d):RequestStop event has been written
+*** AFTER SLEEP 3
+2025-06-22 23:59:44.341:c3: *** Disabled event EventSource(Microsoft-AspNetCore-Server-Kestrel, bdeb4676-a36e-5442-db99-4764e2326c7d)
+^Cinfo: Microsoft.Hosting.Lifetime[0]
       Application is shutting down...
+
+Process finished with exit code 0.
 ```
